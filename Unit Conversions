@@ -1,0 +1,25 @@
+#Converting Fahrenheit to Celcius and Celcius to Fahrenheit
+udfFahrenheitToCelsius(DegF:Number):Number = 
+Round(
+    5 / 9 * DegF,
+    1
+);
+
+#Converting Celcius to Fahrenheit
+udfCelsiusToFahrenheit(DegC:Number):Number = Round(
+    (9 / 5 * DegC) + 32,
+    1
+);
+
+#Converting Miles to Kilometers
+udfMilesToKilometers(Miles:Number):Number = 
+Round(
+    Miles * 160934,
+    2
+);
+
+#Converting Kilometers to Miles
+udfKilometersToMiles(KM:Number):Number = Round(
+    KM / 160934,
+    2
+);
