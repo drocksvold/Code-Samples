@@ -1,0 +1,29 @@
+#Credit to Matthew Devaney for math portion of the functions below
+
+udfPresentValue(PMT:Number,Rate:Number,NPer:Number,FV:Number):Number = 
+-(PMT * (1 / Rate) * (1 - (1/Power(
+    1 + Rate,
+    NPer
+))) + (FV / Power(
+    1 + Rate,
+    NPer
+)));
+
+udfFutureValue(PMT:Number,Rate:Number,NPer:Number,PV:Number):Number = -(PMT * (1 / Rate) * (Power(
+    1 + Rate,
+    NPer
+) - 1) + (PV * Power(
+    1 + Rate,
+    NPer
+)));
+
+udfPayment(Rate:Number,NPer:Number,PV:Number,FV:Number):Number = -(PV / ((1 / Rate) * (1 - (1/Power(
+    1 + Rate,
+    NPer
+)))) + FV / ((1 / Rate) * (Power(
+    1 + Rate,
+    NPer
+) - 1)));
+
+udfNumberOfPeriods(PMT:Number,Rate:Number,FV:Number,PV:Number):Number = Log((PMT / Rate - FV) / (PMT / Rate + PV)) / Log(1 + Rate);
+
