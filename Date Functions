@@ -1,0 +1,340 @@
+#Credit to Matthew Devaney for the functions below
+
+// DATE FUNCTIONS
+udfEndOfMonth(StartDate:Date,EndDate:Date,AddMonths:Number):DateTime = DateAdd(
+    Date(
+        Year(StartDate),
+        Month(StartDate) + 1,
+        1
+    ),
+    AddMonths,
+    TimeUnit.Months
+) - 1 + Time(
+    23,
+    59,
+    59
+);
+udfStartOfMonth(StartDate:Date,AddMonths:Number):DateTime = DateAdd(
+    Date(
+        Year(StartDate),
+        Month(StartDate),
+        1
+    ),
+    AddMonths,
+    TimeUnit.Months
+);
+udfEndOfYear(StartDate:Date,AddYears:Number):DateTime = DateAdd(
+    Date(
+        Year(StartDate),
+        12,
+        31
+    ),
+    AddYears,
+    TimeUnit.Years
+) + Time(
+    23,
+    59,
+    59
+);
+udfStartOfYear(StartDate:Date,AddYear:Number):DateTime = DateAdd(
+    Date(
+        Year(
+            StartDate
+        ),
+        1,
+        1
+    ),
+    AddYear
+);
+
+udfEndOfWeek(StartDate:Date,DayWeekStart:Number,AddWeeks:Number):DateTime = DateAdd(
+    StartDate,
+    (7 - Weekday(
+        StartDate,
+        Switch(
+            DayWeekStart,
+            1,
+            StartOfWeek.Sunday,
+            2,
+            StartOfWeek.Monday,
+            3,
+            StartOfWeek.Tuesday,
+            4,
+            StartOfWeek.Wednesday,
+            5,
+            StartOfWeek.Thursday,
+            6,
+            StartOfWeek.Friday,
+            7,
+            StartOfWeek.Saturday
+        )
+    )) + (7 * AddWeeks),
+    TimeUnit.Days
+) + Time(
+    23,
+    59,
+    59
+);
+udfStartOfWeek(StartDate:Date,DayWeekStart:Number,AddWeeks:Number):DateTime=StartDate - (
+    Weekday(
+    StartDate,
+    Switch(
+        DayWeekStart,
+        1,
+        StartOfWeek.Sunday,
+        2,
+        StartOfWeek.Monday,
+        3,
+        StartOfWeek.Tuesday,
+        4,
+        StartOfWeek.Wednesday,
+        5,
+        StartOfWeek.Thursday,
+        6,
+        StartOfWeek.Friday,
+        7,
+        StartOfWeek.Saturday)
+    )-1
+)+(7*AddWeeks);
+udfNetWorkDays5X8s(StartDate:Date,EndDate:Date):Number=Sum(
+    AddColumns(
+        ForAll(
+            Sequence(
+                DateDiff(
+                    StartDate,
+                    EndDate,
+                    TimeUnit.Days
+                )+1
+            ),
+            StartDate + Value
+        ),
+        IsWeekday,
+        Weekday(Value) in [2,3,4,5,6]
+    ),
+    IsWeekday
+);
+udfNetWorkDays4X10s(StartDate:Date, EndDate:Date):Number = Sum(
+    AddColumns(
+        ForAll(
+            Sequence(
+                DateDiff(
+                    StartDate,
+                    EndDate,
+                    TimeUnit.Days
+                )+1
+            ),
+            StartDate + Value
+        ),
+        IsWeekday,
+        Weekday(Value) in [2,3,4,5]
+    ),
+    IsWeekday
+);
+udfWeekOfYear(StartDate:Date,DayWeekStart:Number):Number=Sum(
+    AddColumns(
+        ForAll(
+            Sequence(
+                DateDiff(
+                    Date(
+                        Year(
+                            StartDate
+                        ),
+                        1,
+                        1
+                    ),
+                    StartDate,
+                    TimeUnit.Days
+                )
+            ),
+            Date(
+                Year(
+                    StartDate
+                ),
+                1,
+                1) + Value
+        ),
+        IsWeekStart,
+        Weekday(Value)=DayWeekStart
+    ),
+    IsWeekStart
+);
+udfYearFraction(StartDate:Date,EndDate:Date,Basis:Number):Number=(
+    DateDiff(
+        Switch(
+            Basis,
+            0, 
+            If(
+                Day(StartDate)=31,
+                Date(Year(StartDate), Month(StartDate), 30),
+                StartDate
+            ),
+            4, If(
+                Day(StartDate)=31,
+                Date(Year(StartDate), Month(StartDate), 30),
+                StartDate
+            ),
+            StartDate
+        ), 
+        Switch(
+            Basis,
+            0, If(
+                Date(Year(EndDate), Month(EndDate)+1, 1)-1=EndDate
+                And Day(StartDate)<30,
+                Date(Year(EndDate), Month(EndDate)+1,1),
+                Date(Year(EndDate), Month(EndDate)+1, 1)-1=EndDate
+                And Day(StartDate)>=30,
+                Date(Year(EndDate), Month(EndDate)+1, 1)-1,
+                EndDate
+            ),
+            4, If(
+                Day(EndDate)=31,
+                Date(Year(EndDate), Month(EndDate), 30),
+                EndDate
+            ),
+            EndDate
+        ), 
+        TimeUnit.Days
+    )-Switch(
+        Basis,
+        0, 1,
+        4, 1,
+        0
+    )
+)
+/Switch(
+    Basis,
+    0, 360,
+    1, DateDiff(Date(Year(EndDate),1,0), Date(Year(EndDate),12,31), TimeUnit.Days),
+    2, 360,
+    3, 365,
+    4, 360
+);
+udfEndOfQuarter(StartDate:Date, AddQuarters:Number):Date = DateAdd(
+    Date(
+        Year(StartDate),
+        Month(StartDate) + 3-Mod(Month(StartDate)-1,3),
+        1
+    )-1,
+    AddQuarters,
+    TimeUnit.Quarters
+)
++Time(23,59,59);
+udfStartOfQuarter(StartDate:Date, AddQuarters:Number):Date =DateAdd(
+    Date(
+        Year(StartDate),
+        Month(StartDate)
+        -If(
+            Mod(Month(StartDate)-1,3) = 0,
+            0,
+            Mod( Month(StartDate)-1, 3)
+        ),
+        1
+    ),
+    AddQuarters,
+    TimeUnit.Quarters
+);
+udfWeekOfMonth(StartDate:Date,DayWeekStart:Number):Number=
+With(
+    {
+        StartDate: Today(), 
+        DayWeekStart:1
+    },
+    Sum(
+        AddColumns(
+            ForAll(
+                Sequence(
+                    DateDiff(
+                        Date(Year(StartDate),Month(StartDate),1),
+                        Date(Year(StartDate),Month(StartDate),Day(StartDate)),
+                        TimeUnit.Days
+                    )
+                ),
+                Date(Year(StartDate),1,1) + Value
+            ),
+            IsWeekStart,
+            Weekday(Value)=DayWeekStart
+        ),
+        IsWeekStart
+    )
+);
+udfIsInCurrentDay(StartDate:Date):Boolean=IsToday(StartDate);
+udfIsInCurrentMonth(StartDate:Date):Boolean=Date(
+    Year(Today()),
+    Month(Today()),
+    1
+) <= StartDate 
+And
+(
+    Date(
+        Year(Today()),
+        Month(Today()) + 1,
+        1
+    ) - 1
+    +Time(23,59,59)
+) >= StartDate;
+udfIsInCurrentYear(StartDate:Date):Boolean=Date(
+    Year(Today()),
+    1,
+    1
+) <= StartDate 
+And
+(
+    Date(
+        Year(Today()),
+        12,
+        31
+    )
+    + Time(23,59,59)
+) >= StartDate;
+udfIsInCurrentWeek(StartDate:Date,DayWeekStart:Number):Boolean=StartDate 
+- (Weekday(
+    Today(),
+    Switch(
+        DayWeekStart,
+        1,StartOfWeek.Sunday,
+        2,StartOfWeek.Monday,
+        3,StartOfWeek.Tuesday,
+        4,StartOfWeek.Wednesday,
+        5,StartOfWeek.Thursday,
+        6,StartOfWeek.Friday,
+        7,StartOfWeek.Saturday)
+    )-1
+) <= StartDate 
+And
+(
+DateAdd(
+    StartDate,
+    (7 - Weekday(
+        StartDate,
+        Switch(
+            DayWeekStart,
+            1,StartOfWeek.Sunday,
+            2,StartOfWeek.Monday,
+            3,StartOfWeek.Tuesday,
+            4,StartOfWeek.Wednesday,
+            5,StartOfWeek.Thursday,
+            6,StartOfWeek.Friday,
+            7,StartOfWeek.Saturday)
+        )
+    ),
+    TimeUnit.Days
+)
++Time(23,59,59)) >= StartDate;
+udfIsInCurrentQuarter(StartDate:Date):Boolean=Date(
+    Year(Today()),
+    Month(Today())
+    -If(
+        Mod(Month(Today())-1,3) = 0,
+        0,
+        Mod( Month(Today())-1, 3)
+    ),
+    1
+) <= StartDate 
+And
+(
+    Date(
+        Year(Today()),
+        Month(Today()) + 3-Mod(Month(Today())-1,3),
+        1
+    )-1
++Time(23,59,59))>= StartDate;
