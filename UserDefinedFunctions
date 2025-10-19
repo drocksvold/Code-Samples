@@ -3,3 +3,41 @@ fxDocTypeIcons(Extension:Text):Text = $"https://static2.sharepointonline.com/fil
 
 #This formula will get the centered dimension for use in positioning controls in Power Apps
 udfGetCenteredDimension( ParentDimension:Number, SelfDimension:Number):Number = ((ParentDimension - SelfDimension) / 2);
+
+#This function will create appointment time slots
+udfGenerateAppointmentCalendarWindows(CalStartDate:DateTime, CalStartTime:Text,AppointmentCount:Number,AppointmentDuration:Number):Dynamic = ParseJSON(
+    JSON(
+        AddColumns(
+            Sequence(
+                AppointmentCount,
+                0
+            ) As MyNum,
+            myTime,
+            Text(
+                DateAdd(
+                    DateTimeValue(CalStartTime),
+                    30 * MyNum.Value,
+                    TimeUnit.Minutes
+                ),
+                DateTimeFormat.ShortTime
+            ),
+            myDate,
+            Text(
+                DateAdd(
+                    DateTimeValue(
+                        CalStartDate & " " & Text(
+                            LookUp(
+                                fxAppointmentTimes,
+                                CalStartTime = StartTimeAMPM,
+                                StartTime24
+                            )
+                        )
+                    ),
+                    30 * MyNum.Value,
+                    TimeUnit.Minutes
+                )
+            )
+        )
+    )
+);
+
