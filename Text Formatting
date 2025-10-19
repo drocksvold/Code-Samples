@@ -1,0 +1,14 @@
+# Text Formatting
+# Currency format  value to £GBP
+udfCurrencyFormatGBP(TotalValue:Number):Text = 
+ext(
+    TotalValue,
+    "£#,##0.00"
+);
+
+# Currency format  value to $US
+udfCurrencyFormatUSD(TotalValue:Number):Text = 
+Text(
+    TotalValue,
+    "$#,##0.00"
+);
