@@ -1,6 +1,7 @@
 #Credit to Matthew Devaney for the functions below
 
 // DATE FUNCTIONS
+//Find the end of the month
 udfEndOfMonth(StartDate:Date,EndDate:Date,AddMonths:Number):DateTime = DateAdd(
     Date(
         Year(StartDate),
@@ -14,6 +15,7 @@ udfEndOfMonth(StartDate:Date,EndDate:Date,AddMonths:Number):DateTime = DateAdd(
     59,
     59
 );
+//Find the start of the month
 udfStartOfMonth(StartDate:Date,AddMonths:Number):DateTime = DateAdd(
     Date(
         Year(StartDate),
@@ -23,6 +25,7 @@ udfStartOfMonth(StartDate:Date,AddMonths:Number):DateTime = DateAdd(
     AddMonths,
     TimeUnit.Months
 );
+//Find the end of the year
 udfEndOfYear(StartDate:Date,AddYears:Number):DateTime = DateAdd(
     Date(
         Year(StartDate),
@@ -36,6 +39,7 @@ udfEndOfYear(StartDate:Date,AddYears:Number):DateTime = DateAdd(
     59,
     59
 );
+//Find the start of the year
 udfStartOfYear(StartDate:Date,AddYear:Number):DateTime = DateAdd(
     Date(
         Year(
@@ -46,7 +50,7 @@ udfStartOfYear(StartDate:Date,AddYear:Number):DateTime = DateAdd(
     ),
     AddYear
 );
-
+//Find the end of the week
 udfEndOfWeek(StartDate:Date,DayWeekStart:Number,AddWeeks:Number):DateTime = DateAdd(
     StartDate,
     (7 - Weekday(
@@ -75,6 +79,7 @@ udfEndOfWeek(StartDate:Date,DayWeekStart:Number,AddWeeks:Number):DateTime = Date
     59,
     59
 );
+//Find the start of the week
 udfStartOfWeek(StartDate:Date,DayWeekStart:Number,AddWeeks:Number):DateTime=StartDate - (
     Weekday(
     StartDate,
@@ -96,6 +101,7 @@ udfStartOfWeek(StartDate:Date,DayWeekStart:Number,AddWeeks:Number):DateTime=Star
         StartOfWeek.Saturday)
     )-1
 )+(7*AddWeeks);
+//Find the number of working days for a person that works a 5 x 8 schedule
 udfNetWorkDays5X8s(StartDate:Date,EndDate:Date):Number=Sum(
     AddColumns(
         ForAll(
@@ -113,6 +119,7 @@ udfNetWorkDays5X8s(StartDate:Date,EndDate:Date):Number=Sum(
     ),
     IsWeekday
 );
+//Find the number of working days for a person that works a 4 x 10 schedule
 udfNetWorkDays4X10s(StartDate:Date, EndDate:Date):Number = Sum(
     AddColumns(
         ForAll(
@@ -158,6 +165,7 @@ udfWeekOfYear(StartDate:Date,DayWeekStart:Number):Number=Sum(
     ),
     IsWeekStart
 );
+//Find the fraction of the year
 udfYearFraction(StartDate:Date,EndDate:Date,Basis:Number):Number=(
     DateDiff(
         Switch(
@@ -209,6 +217,7 @@ udfYearFraction(StartDate:Date,EndDate:Date,Basis:Number):Number=(
     3, 365,
     4, 360
 );
+//Find the end of the quarter
 udfEndOfQuarter(StartDate:Date, AddQuarters:Number):Date = DateAdd(
     Date(
         Year(StartDate),
@@ -219,6 +228,7 @@ udfEndOfQuarter(StartDate:Date, AddQuarters:Number):Date = DateAdd(
     TimeUnit.Quarters
 )
 +Time(23,59,59);
+//Find the start of the quarter
 udfStartOfQuarter(StartDate:Date, AddQuarters:Number):Date =DateAdd(
     Date(
         Year(StartDate),
@@ -233,6 +243,7 @@ udfStartOfQuarter(StartDate:Date, AddQuarters:Number):Date =DateAdd(
     AddQuarters,
     TimeUnit.Quarters
 );
+//Find the week of the month
 udfWeekOfMonth(StartDate:Date,DayWeekStart:Number):Number=
 With(
     {
@@ -257,7 +268,9 @@ With(
         IsWeekStart
     )
 );
+//Find if the date is in the current day
 udfIsInCurrentDay(StartDate:Date):Boolean=IsToday(StartDate);
+//Find if the date is in the current MOnth
 udfIsInCurrentMonth(StartDate:Date):Boolean=Date(
     Year(Today()),
     Month(Today()),
@@ -272,6 +285,7 @@ And
     ) - 1
     +Time(23,59,59)
 ) >= StartDate;
+//Find if the date is in the current year
 udfIsInCurrentYear(StartDate:Date):Boolean=Date(
     Year(Today()),
     1,
@@ -286,6 +300,7 @@ And
     )
     + Time(23,59,59)
 ) >= StartDate;
+//Find if the date is in the current week
 udfIsInCurrentWeek(StartDate:Date,DayWeekStart:Number):Boolean=StartDate 
 - (Weekday(
     Today(),
@@ -320,6 +335,7 @@ DateAdd(
     TimeUnit.Days
 )
 +Time(23,59,59)) >= StartDate;
+//Find if the date is in the current quarter
 udfIsInCurrentQuarter(StartDate:Date):Boolean=Date(
     Year(Today()),
     Month(Today())
