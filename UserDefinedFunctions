@@ -40,4 +40,38 @@ udfGenerateAppointmentCalendarWindows(CalStartDate:DateTime, CalStartTime:Text,A
         )
     )
 );
+#This function grabs the last two digits of the year from a date value
+udfGetSelectedYear(JSADate:Date):Number = Value(
+    Right(
+        Year(JSADate),
+        2
+    )
+);
 
+#This function uses the get selected year function above to reeturn a value from the Sequential Number
+# column and add one to return the value for the next record.
+udfGetSequentialNumber(JSADate:Date):Number = If(
+    IsBlank(
+        First(
+            SortByColumns(
+                Filter(
+                    PermitNumbers,
+                    PermitYear = Value(udfGetSelectedYear(JSADate))
+                ),
+                "SequentialNumber",
+                SortOrder.Descending
+            )
+        ).SequentialNumber
+    ),
+    1,
+    First(
+        SortByColumns(
+            Filter(
+                PermitNumbers,
+                PermitYear = Value(udfGetSelectedYear(JSADate))
+            ),
+            "SequentialNumber",
+            SortOrder.Descending
+        )
+    ).SequentialNumber + 1
+);
