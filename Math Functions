@@ -1,10 +1,16 @@
 #Mathematical Calculations
 
 udfMultiplyNumbers(Number1:Number, Number2:Number):Number = Number1 * Number2;
+
 udfDivideNumbers(Number1:Number, Number2:Number):Number = Number1 / Number2;
+
 udfAddNumbers(Number1:Number, Number2:Number):Number = Number1 + Number2;
+
 udfSubtractNumbers(Number1:Number, Number2:Number):Number = Number1 - Number2;
+
 udfCalculateVolumeOfCube(Length:Number, Width:Number, Height:Number):Number = Length * Width * Height;
+
 udfCalculateVolumeOfSphere(PI:Number, Radius:Number):Number = 4 / 3 * PI * Radius ^ 3;
+
 udfCalculateAreaOfCircle(Radius:Number,PI:Number):Number = PI * Radius ^ 2;
 
