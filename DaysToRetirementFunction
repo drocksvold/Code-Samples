@@ -1,0 +1,79 @@
+#My director at work keeps asking me how much longer he has me around for.
+#so I made this to give him an accurate count of how many days I have left
+
+# Credit to Matthew Devaney for his net working days function which got my wheels turning...
+
+#This function takes start and end dates, as well as vacation days as inputs and 
+#calculates the number of working days between now and the end date after subtracting
+#the vacation time available.
+udfNetWorkDays5X8s(StartDate:Date,EndDate:Date,VacationDays:Number):Number = Sum(
+    AddColumns(
+        ForAll(
+            Sequence(
+                DateDiff(
+                    StartDate,
+                    EndDate,
+                    TimeUnit.Days
+                ) + 1
+            ),
+            StartDate + Value
+        ),
+        IsWeekday,
+        Weekday(Value) in [
+            2,
+            3,
+            4,
+            5,
+            6
+        ]
+    ),
+    IsWeekday
+)-VacationDays;
+udfNetWorkDays4X10s(StartDate:Date, EndDate:Date,VacationDays:Number):Number = Sum(
+    AddColumns(
+        ForAll(
+            Sequence(
+                DateDiff(
+                    StartDate,
+                    EndDate,
+                    TimeUnit.Days
+                ) + 1
+            ),
+            StartDate + Value
+        ),
+        IsWeekday,
+        Weekday(Value) in [
+            2,
+            3,
+            4,
+            5
+        ]
+    ),
+    IsWeekday
+)-VacationDays;
+
+# To use the function I have added a text box to the Power App for the user to enter the number of vacation 
+#hours they will have available between now and retirement.  This value is divided by the number of hours
+#they work per day to determine the number of days to remove from the number of working days 
+#(assuming they use all their vacation)
+If(
+    locWorkSchedule = "4 x 10",
+    UpdateContext(
+        {
+            locDaysToRetirement: udfNetWorkDays4X10s(
+                Today(),
+                dpRetirementDate.SelectedDate,
+                locVacationHours/10
+            )
+        }
+    ),
+    UpdateContext(
+        {
+            locDaysToRetirement: udfNetWorkDays5X8s(
+                Today(),
+                dpRetirementDate.SelectedDate,
+                locVacationHours/8
+            )
+        }
+    )
+);
